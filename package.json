@@ -1,0 +1,29 @@
+{
+  "name": "ts-towers-express",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^4.17.1",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@types/multer": "^1.4.12",
+    "express": "^4.17.1",
+    "firebase-admin": "^13.1.0",
+    "multer": "^2.0.0",
+    "socket.io": "^4.8.1",
+    "towers-express": "^1.0.2-b"
+  }
+}
