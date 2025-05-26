@@ -4,27 +4,31 @@ import * as admin from 'firebase-admin';
 import { UserRecord } from "firebase-admin/lib/auth/user-record";
 import { userHasRight, UserRightEnum } from "../utils/user-roles";
 import { RequestT, ResponseT, TowersFunction, TowersFunctionsController } from "towers-express";
+import { createUser, deleteUser, getAllUsers, getUserPermissions, updateUserPassword, updateUserPermissions } from "./users-functions";
+import { getAllFunctionsDetails, ping } from "./test-functions";
 
-type CustomFunction = TowersFunction & {
+export type CustomFunction = TowersFunction & {
     auth?: boolean;
     rights?: {
         user?: UserRightEnum[];
     };
 }
 
-const ping: CustomFunction = {
-    auth: false,
-    method: async (req: RequestT, res: ResponseT) => {
-        res.status(200).json({ message: 'pong' });
-    }
-}
-
-const hubFunctions: Record<string, CustomFunction> = {
+const myFunctions: Record<string, CustomFunction> = {
+    getAllFunctionsDetails,
     ping,
+    // User management functions
+    getAllUsers,
+    deleteUser,
+    createUser,
+    updateUserPassword,
+    updateUserPermissions,
+    getUserPermissions,
+    // Add more functions here
 }
 
 export const addAllFunctions = () => {
-    for (const [key, value] of Object.entries(hubFunctions)) {
+    for (const [key, value] of Object.entries(myFunctions)) {
         TowersFunctionsController.registerFunction(key, value as TowersFunction);
     }
     TowersFunctionsController.setAuthUserFunction(customAuthUser);

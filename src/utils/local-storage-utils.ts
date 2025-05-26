@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { LOCAL_STORAGE_PATH } from "../vars";
 
 export class AppLocalStorage {
     public static storageDir = LOCAL_STORAGE_PATH;
@@ -8,12 +9,38 @@ export class AppLocalStorage {
         return path.join(this.storageDir, `${key}.json`);
     }
 
+    private static getCollectionPath(key: string): string {
+        return path.join(this.storageDir, `${key}`);
+    }
+
     static setItem(key: string, value: any) {
         const filePath = this.getFilePath(key);
         try {
+            // Ensure the directory exists
+            const dir = path.dirname(filePath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
             fs.writeFileSync(filePath, JSON.stringify(value, null, 2), "utf-8");
         } catch (error) {
             console.error(`Error writing to ${filePath}:`, error);
+        }
+    }
+    
+    static getCollection<T>(key: string): {id: string, value: T}[] {
+        const collectionPath = this.getCollectionPath(key);
+        if (!fs.existsSync(collectionPath)) return [];
+
+        try {
+            const files = fs.readdirSync(collectionPath);
+            return files.map(file => {
+                const filePath = path.join(collectionPath, file);
+                const data = fs.readFileSync(filePath, "utf-8");
+                return {id: file.replace('.json', ''), value: JSON.parse(data) as T};
+            });
+        } catch (error) {
+            console.error(`Error reading collection ${collectionPath}:`, error);
+            return [];
         }
     }
 

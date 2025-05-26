@@ -1,8 +1,11 @@
 import path from 'path';
+import fs from 'fs';
 import { Server } from "socket.io";
 import { SocketUtils } from './utils/socket-utils';
 import { TowersExpress } from 'towers-express';
 import { addAllFunctions } from './functions';
+import { CERTIFICATE_PATH, LOCAL_STORAGE_PATH, LOGS_PATH } from './vars';
+import { LocalDbUtils } from './utils/database-utils';
 
 // write here the path to your certificates
 const certificatesUrl = CERTIFICATE_PATH;
@@ -33,3 +36,15 @@ towersExpress.start({
 
 // Initialize all functions
 addAllFunctions();
+
+// initilize logs and app local storage
+// Ensure LOGS_PATH is defined and exists
+if (!fs.existsSync(LOGS_PATH)) {
+    fs.mkdirSync(LOGS_PATH, { recursive: true });
+    console.log(`Created logs directory at ${LOGS_PATH}`);
+}
+// Ensure LOCAL_STORAGE_PATH is defined and exists
+if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
+    fs.mkdirSync(LOCAL_STORAGE_PATH, { recursive: true });
+    console.log(`Created local storage directory at ${LOCAL_STORAGE_PATH}`);
+}

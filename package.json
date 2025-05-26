@@ -24,6 +24,6 @@
     "firebase-admin": "^13.1.0",
     "multer": "^2.0.0",
     "socket.io": "^4.8.1",
-    "towers-express": "^1.0.2-b"
+    "towers-express": "^1.0.3"
   }
 }

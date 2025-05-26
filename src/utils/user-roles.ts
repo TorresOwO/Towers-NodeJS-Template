@@ -3,6 +3,11 @@ import { UserRecord } from 'firebase-admin/lib/auth/user-record';
 
 export enum UserRightEnum {
     admin = "admin",
+    viewUsers = "viewUsers",
+    createUser = "createUser",
+    editUserRoles = "editUserRoles",
+    editUserPassword = "editUserPassword",
+    deleteUsers = "deleteUsers",
 }
 
 export async function userHasRight(uid: string | UserRecord, right: UserRightEnum): Promise<boolean> {

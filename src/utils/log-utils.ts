@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { LOGS_PATH } from '../vars';
 
 export class LogUtils {
     private static logFilePath = LOGS_PATH;
