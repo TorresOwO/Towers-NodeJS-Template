@@ -4,7 +4,7 @@ import * as admin from 'firebase-admin';
 import { UserRecord } from "firebase-admin/lib/auth/user-record";
 import { userHasRight, UserRightEnum } from "../utils/user-roles";
 import { RequestT, ResponseT, TowersFunction, TowersFunctionsController } from "towers-express";
-import { createUser, deleteUser, getAllUsers, getUserPermissions, updateUserPassword, updateUserPermissions } from "./users-functions";
+import { createUser, deleteUser, getAllUsers, getUserPermissions, getUserProfilePicture, updateUserPassword, updateUserPermissions, uploadUserProfilePicture } from "./users-functions";
 import { getAllFunctionsDetails, ping } from "./test-functions";
 
 export type CustomFunction = TowersFunction & {
@@ -24,6 +24,8 @@ const myFunctions: Record<string, CustomFunction> = {
     updateUserPassword,
     updateUserPermissions,
     getUserPermissions,
+    uploadUserProfilePicture,
+    getUserProfilePicture,
     // Add more functions here
 }
 

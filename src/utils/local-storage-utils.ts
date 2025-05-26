@@ -77,7 +77,13 @@ export class AppLocalStorage {
      */
     static saveFile(fileName: string, fileData: Buffer, makeUnique = false): { success: boolean; name?: string; error?: string } {
         // Sanitiza el nombre del archivo
-        let sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const imagesDir = path.join(this.storageDir, "files");
+        const filePath = path.join(imagesDir, fileName);
+        const fileNamePath = path.dirname(fileName);
+        const fullDir = path.dirname(filePath);
+        const onlyName = path.basename(fileName);
+
+        let sanitizedFileName = onlyName.replace(/[^a-zA-Z0-9._-]/g, '_');
         
         if (makeUnique) {
             // Agrega timestamp para asegurar nombres únicos
@@ -87,14 +93,12 @@ export class AppLocalStorage {
             sanitizedFileName = `${base}_${Date.now()}${ext}`;
         }
         
-        const imagesDir = path.join(this.storageDir, "images");
-        
         // Asegura que el directorio de imágenes existe
-        if (!fs.existsSync(imagesDir)) {
+        if (!fs.existsSync(fullDir)) {
             try {
-                fs.mkdirSync(imagesDir, { recursive: true });
+                fs.mkdirSync(fullDir, { recursive: true });
             } catch (error) {
-                console.error(`Error al crear directorio ${imagesDir}:`, error);
+                console.error(`Error al crear directorio ${fullDir}:`, error);
                 return { 
                     success: false, 
                     error: `No se pudo crear el directorio: ${(error as Error).message}` 
@@ -102,13 +106,12 @@ export class AppLocalStorage {
             }
         }
         
-        const filePath = path.join(imagesDir, sanitizedFileName);
         
         try {
             fs.writeFileSync(filePath, fileData);
             return { 
                 success: true, 
-                name: sanitizedFileName
+                name: path.join(fileNamePath, sanitizedFileName)
             };
         } catch (error) {
             console.error(`Error al escribir archivo ${filePath}:`, error);
@@ -120,7 +123,7 @@ export class AppLocalStorage {
     }
 
     static getFile(fileName: string): Buffer | null {
-        const filePath = path.join(this.storageDir, "images", fileName);
+        const filePath = path.join(this.storageDir, "files", fileName);
         if (!fs.existsSync(filePath)) return null;
 
         try {

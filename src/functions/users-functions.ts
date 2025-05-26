@@ -1,7 +1,8 @@
-import { TowersFunctionsController } from "towers-express";
 import { CustomFunction } from ".";
 import { userHasRight, UserRightEnum } from "../utils/user-roles";
 import * as admin from 'firebase-admin';
+import { AppLocalStorage } from "../utils/local-storage-utils";
+import path from 'path';
 
 /**
  * Función para crear un nuevo usuario
@@ -331,3 +332,66 @@ export const getUserPermissions: CustomFunction = {
         }
     }
 };
+
+/**
+ * Función para guardar la foto de perfil de un usuario
+ */
+export const uploadUserProfilePicture: CustomFunction = {
+    auth: true,
+    maxFiles: 1,
+    method: async (req, res, user) => {
+        // Verificar si hay un archivo adjunto
+        if (!req.file) {
+            res.status(400).send({ error: "No file has been uploaded" });
+            return;
+        }
+
+        const fileName = user.uid; // Usar el UID del usuario como nombre de archivo
+        const result = AppLocalStorage.saveFile(path.join("profile-pictures", fileName), req.file.buffer, false);
+        if (!result.success) {
+            res.status(500).send({ error: `Error saving profile picture: ${result.error}` });
+            return;
+        }
+
+        // enviar en la respuesta la url de la imagen guardada
+        return res.send({
+            data: {
+                message: "Profile picture uploaded successfully",
+                url: "/getUserProfilePicture?path=" + result.name,
+            }
+        });
+    }
+}
+
+/**
+ * Función para obtener la foto de perfil de un usuario
+ */
+export const getUserProfilePicture: CustomFunction = {
+    auth: false,
+    bodySchema: {
+        type: "object",
+        properties: {
+            uid: { type: "string", description: "ID del usuario del que se quiere obtener la foto de perfil" }
+        },
+        required: ["uid"],
+        additionalProperties: false
+    },
+    method: async (req, res) => {
+        const { uid } = req.body;
+
+        // Validar datos recibidos
+        if (!uid) {
+            return res.status(400).send({ error: "User ID is required" });
+        }
+
+        const buffer = AppLocalStorage.getFile(path.join("profile-pictures", uid))
+
+        // Enviar el archivo de imagen
+        if (!buffer) {
+            return res.status(404).send({ error: "Profile picture not found" });
+        }
+        res.setHeader('Content-Type', 'image/jpeg'); // Cambia el tipo según el formato de la imagen
+        res.setHeader('Content-Disposition', `inline; filename="${uid}.jpg"`); // Cambia la extensión según el formato de la imagen
+        res.send(buffer);
+    }
+}
